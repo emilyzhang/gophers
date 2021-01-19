@@ -3,6 +3,9 @@
 build:
 	go build -o dist/eventlite
 
+run: build
+	./dist/eventlite --config config.env
+
 up:
 	docker-compose up
 

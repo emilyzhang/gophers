@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 
 	"github.com/joho/godotenv"
@@ -12,26 +11,29 @@ import (
 )
 
 func main() {
-	fmt.Println("hello world!")
+	log := logrus.New()
+	log.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:    true,
+		QuoteEmptyFields: true,
+	})
+
 	envFile := flag.String("config", "", "the .env configuration file to load")
 	flag.Parse()
-	fmt.Println(envFile)
-	cfg, err := loadConfig(*envFile)
-	fmt.Println(cfg)
 
-	log := logrus.New()
+	cfg, err := loadConfig(*envFile)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to load the configuration")
 	}
+	log.Println(cfg)
 }
 
 type config struct {
-	APIPort string
+	APIPort int
 
 	DBHost string
 	DBUser string 
 	DBPassword string
-	DBPort string
+	DBPort int
 	DBName string
 }
 

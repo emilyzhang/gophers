@@ -1,4 +1,4 @@
-.PHONY: build up down run-migrations psql
+.PHONY: build run up down psql
 
 build:
 	go build -o dist/eventlite

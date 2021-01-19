@@ -1,0 +1,13 @@
+.PHONY: build up down run-migrations psql
+
+build:
+	go build -o dist/eventlite
+
+up:
+	docker-compose up
+
+down:
+	docker-compose down
+
+psql:
+	docker-compose run postgres psql -h postgres postgres

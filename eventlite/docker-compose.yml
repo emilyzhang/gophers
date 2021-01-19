@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  gophers:
+
+services:
+  postgres:
+    image: 'postgres:12.1'
+    networks:
+      - 'gophers'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d/
+  web:
+    build: .
+    networks:
+      - 'gophers'
+    ports:
+      - '5000:5000'
+    depends_on:
+      - postgres

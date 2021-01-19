@@ -1,0 +1,108 @@
+swagger: "3.0"
+info:
+  title: Simple Ticketing API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: a simple health check endpoint
+      responses:
+        200:
+          description: an empty response body
+
+  /events:
+    post:
+      summary: create a new event
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+              required:
+                - name
+                - location
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the id of the new event
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}:
+    get:
+      summary: get a single event
+      produces:
+        - application/json
+      responses:
+        200:
+          description: the event listed
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    example: 4
+                  name:
+                    type: string
+                    example: "bruce wayne"
+                  location:
+                    type: string
+                    example: "san francisco, ca, usa"
+        default:
+          $ref: '#/components/responses/Error'
+    put:
+      summary: update an existing event
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+      responses:
+        200:
+          description: the event was updated
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: delete the event and associated attendees
+      produces:
+        - application/json
+      responses:
+        200:
+          description: the event was deleted and the associated attendees
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  responses:
+    Error:
+      properties:
+        type:
+          type: string
+          example: 'error'
+        msg:
+          type: string
+          example: 'missing fields: [location]'

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -17,14 +18,18 @@ func main() {
 		QuoteEmptyFields: true,
 	})
 
+	// simple loading of config
 	envFile := flag.String("config", "", "the .env configuration file to load")
 	flag.Parse()
-
 	cfg, err := loadConfig(*envFile)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to load the configuration")
 	}
 	log.Println(cfg)
+
+	// start API
+	a := api{logger: log, port: ":"+strconv.Itoa(cfg.APIPort)}
+	a.start()
 }
 
 type config struct {
@@ -36,7 +41,6 @@ type config struct {
 	DBPort int
 	DBName string
 }
-
 
 func loadConfig(file string) (config, error) {
 	var cfg config
@@ -53,13 +57,25 @@ func loadConfig(file string) (config, error) {
 
 type api struct {
 	logger logrus.FieldLogger
+	port string
 }
 
-func (a *api) router(w http.ResponseWriter, req *http.Request) {
-	a.logger.Printf("New request: %s", req.URL.Path)
-	// pathPattern := regexp.MustCompile(`/(status|results)/\d+`)
-	// fmt.Println(pathPattern)
-	if req.URL.Path == "/crawl" && req.Method == http.MethodPost {
+func (a *api) router(w http.ResponseWriter, r *http.Request) {
+	a.logger.Printf("New request: %s", r.URL.Path)
+	if r.URL.Path == "/" {
+		a.handleRoot(w, r)
 		return
 	}
+}
+
+// start starts the server.
+func (a *api) start() {
+	http.HandleFunc("/", a.router)
+	a.logger.Print("Starting API server. Hello world!")
+	http.ListenAndServe(a.port, nil)
+	// TODO: implement graceful server shut down
+}
+
+func (a *api) handleRoot(w http.ResponseWriter, r *http.Request) {
+	a.logger.Info("handling root")
 }
